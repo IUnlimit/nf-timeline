@@ -1,0 +1,39 @@
+{
+	"name": "narrafork-dsh-timeline",
+	"version": "0.2.0",
+	"private": true,
+	"type": "module",
+	"description": "Single-track session timeline plugin for NarraFork: turns, messages, activity gaps, tool calls, permission waits",
+	"license": "MIT",
+	"author": "IllTamer",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/IUnlimit/nf-timeline.git"
+	},
+	"homepage": "https://github.com/IUnlimit/nf-timeline#readme",
+	"bugs": "https://github.com/IUnlimit/nf-timeline/issues",
+	"keywords": [
+		"narrafork",
+		"narrafork-plugin",
+		"timeline",
+		"observability"
+	],
+	"packageManager": "bun@1.4.3",
+	"engines": {
+		"bun": ">=1.2"
+	},
+	"scripts": {
+		"build": "bun run scripts/build.ts",
+		"pack": "bun run scripts/pack.ts",
+		"validate": "bun run scripts/validate.ts",
+		"test": "bun test --isolate",
+		"typecheck": "tsc --noEmit",
+		"check": "biome check .",
+		"verify": "bun run check && bun run typecheck && bun run test && bun run build && bun run validate && bun run pack"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.5.15",
+		"@types/bun": "^1.3.5",
+		"typescript": "^5.9.3"
+	}
+}

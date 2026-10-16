@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Verify and package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.3"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint and format check
+        run: bun run check
+
+      - name: Type-check
+        run: bun run typecheck
+
+      - name: Test
+        run: bun test --isolate
+
+      - name: Build plugin bundle
+        run: bun run build
+
+      - name: Validate package layout
+        run: bun run validate
+
+      - name: Pack .nfplugin
+        run: bun run pack
+
+      - name: Validate the packed archive
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/unpacked"
+          unzip -q release/*.nfplugin -d "$RUNNER_TEMP/unpacked"
+          bun run scripts/validate.ts "$RUNNER_TEMP/unpacked"
+
+      - name: Upload .nfplugin artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nfplugin-${{ github.sha }}
+          path: release/*.nfplugin
+          if-no-files-found: error
+          retention-days: 14

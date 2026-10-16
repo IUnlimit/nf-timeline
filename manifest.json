@@ -1,0 +1,73 @@
+{
+	"schemaVersion": 1,
+	"pluginId": "dev.illtamer.narrafork-dsh-timeline",
+	"version": "0.2.0",
+	"displayName": "Session Execution Timeline",
+	"description": "Single-track timeline of a narrator session: turns, messages, activity gaps, tool calls, permission waits. Persists what it observes so a reopened panel keeps its history.",
+	"publisher": {
+		"id": "dev.illtamer",
+		"name": "IllTamer"
+	},
+	"license": "MIT",
+	"engine": {
+		"runtime": "bun",
+		"runtimeVersion": ">=1.2 <2",
+		"hostApi": ">=1.0 <2",
+		"rpc": "narrafork.rpc/1",
+		"features": [],
+		"os": ["linux", "darwin", "win32"],
+		"arch": ["x64", "arm64"],
+		"runner": "local-process"
+	},
+	"ui": {
+		"entry": "ui/timeline.iife.js",
+		"format": "iife",
+		"style": "ui/timeline.css",
+		"shell": "host-controlled"
+	},
+	"activationEvents": ["onView:dsh-timeline"],
+	"contributes": {
+		"providers": [],
+		"tools": [],
+		"commands": [],
+		"events": [],
+		"views": [
+			{
+				"id": "dsh-timeline",
+				"title": "Timeline",
+				"entry": "ui/timeline.iife.js",
+				"style": "ui/timeline.css",
+				"surfaces": ["focus"],
+				"scope": "narrator",
+				"instance": "singleton-per-narrator",
+				"defaultPosition": "bottom"
+			}
+		]
+	},
+	"permissions": {
+		"host": [
+			"ui.panel",
+			"query.read.narrators",
+			"event.subscribe",
+			"storage.read_self",
+			"storage.write_self"
+		],
+		"network": {
+			"mode": "none",
+			"allow": []
+		},
+		"filesystem": {
+			"package": "readOnly",
+			"pluginData": "none",
+			"workspace": "none"
+		},
+		"process": {
+			"spawn": "none"
+		}
+	},
+	"secrets": [],
+	"dependencies": {
+		"plugins": {},
+		"runtime": {}
+	}
+}

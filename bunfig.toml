@@ -1,0 +1,4 @@
+# Test discovery is limited to `tests/`: `attic/` holds superseded sources kept for
+# reference, and their imports intentionally no longer resolve.
+[test]
+root = "tests"

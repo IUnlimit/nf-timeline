@@ -1,0 +1,16 @@
+narrafork-dsh-timeline
+Copyright (c) 2026 IllTamer
+
+This package is a NarraFork plugin. It bundles no third-party runtime libraries: the
+UI is a single IIFE plus one CSS file, built from the sources in this repository.
+
+Interaction ideas (turn grouping, duration display, collapsible detail, keeping
+terminal state on screen) are inspired by DeepSeek Harness-style run timelines. No
+DeepSeek source code or UI assets are included.
+
+NarraFork host API contract used by this plugin (verified against NarraFork 0.9.1):
+  protocol: narrafork.ui/1
+  query:    narrafork.narrator.messages.list
+  events:   narrafork.narrator.{tool.changed,message.changed,lifecycle,attention,permission.changed}
+            narrafork.events.resync_required
+  storage:  plugin storage, narrator scope

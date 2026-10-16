@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish the plugin archive
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.3"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Require the tag to match package.json
+        run: |
+          set -euo pipefail
+          version="$(bun -e 'console.log(require("./package.json").version)')"
+          tag="${GITHUB_REF_NAME#v}"
+          if [ "$version" != "$tag" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match package.json version $version"
+            exit 1
+          fi
+
+      - name: Lint and format check
+        run: bun run check
+
+      - name: Type-check
+        run: bun run typecheck
+
+      - name: Test
+        run: bun test --isolate
+
+      - name: Build plugin bundle
+        run: bun run build
+
+      - name: Validate package layout
+        run: bun run validate
+
+      - name: Pack .nfplugin
+        run: bun run pack
+
+      - name: Validate the packed archive
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/unpacked"
+          unzip -q release/*.nfplugin -d "$RUNNER_TEMP/unpacked"
+          bun run scripts/validate.ts "$RUNNER_TEMP/unpacked"
+
+      - name: Create GitHub Release with the .nfplugin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create "$GITHUB_REF_NAME" release/*.nfplugin \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes
